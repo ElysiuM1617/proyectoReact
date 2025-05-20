@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import './LoginSignup.css';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from '../../firebase'; // Ajusta la ruta si mueves firebase.js a src/
+import { useNavigate } from 'react-router-dom';
 
 import user_icon from '../Assets/person.png';
 import email_icon from '../Assets/email.png';
 import password_icon from '../Assets/password.png';
 
 export const LoginSignup = () => {
+  const navigate = useNavigate();
   const [action, setAction] = useState('Iniciar sesion');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -53,6 +55,8 @@ export const LoginSignup = () => {
         setMessage(`Bienvenido de nuevo, ${email}`);
         setEmail('');
         setPassword('');
+
+        navigate('/home'); // Redirige a la página de inicio después de iniciar sesión
       }
     } catch (error) {
       if (error.code === 'auth/email-already-in-use') {

@@ -1,12 +1,18 @@
-import './App.css';
-import { LoginSignup } from './Components/Login-Signup/LoginSignup';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { LoginSignup }  from './Components/Login-Signup/LoginSignup';
+import { Home }  from './Home';
 
-function App() {
+export const App = () => {
   return (
-    <div>
-      <LoginSignup/>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginSignup />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
