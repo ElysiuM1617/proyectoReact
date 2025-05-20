@@ -1,5 +1,8 @@
+
 import React, { useState } from 'react';
 import './LoginSignup.css';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from '../../firebase'; // Ajusta la ruta si mueves firebase.js a src/
 
 import user_icon from '../Assets/person.png';
 import email_icon from '../Assets/email.png';
@@ -13,7 +16,7 @@ export const LoginSignup = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
@@ -33,10 +36,34 @@ export const LoginSignup = () => {
       return;
     }
 
-    if (action === 'Registrarse') {
-      setMessage(`Usuario registrado: ${name} (${email})`);
-    } else {
-      setMessage(`Bienvenido de nuevo, ${email}`);
+    try {
+      if (action === 'Registrarse') {
+        // Registro con Firebase
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Guardar el nombre en el perfil del usuario
+        await updateProfile(userCredential.user, { displayName: name });
+        setMessage(`Usuario registrado: ${name} (${email})`);
+        // Opcional: limpiar campos o cambiar a iniciar sesión
+        setName('');
+        setEmail('');
+        setPassword('');
+      } else {
+        // Inicio de sesión con Firebase
+        await signInWithEmailAndPassword(auth, email, password);
+        setMessage(`Bienvenido de nuevo, ${email}`);
+        setEmail('');
+        setPassword('');
+      }
+    } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        setError('El email ya está en uso.');
+      } else if (error.code === 'auth/user-not-found') {
+        setError('Usuario no encontrado.');
+      } else if (error.code === 'auth/wrong-password') {
+        setError('Contraseña incorrecta.');
+      } else {
+        setError('Error: ' + error.message);
+      }
     }
   };
 
